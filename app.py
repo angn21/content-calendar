@@ -2,6 +2,9 @@ import streamlit as st
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import pandas as pd
+import calendar
+from datetime import datetime
+import plotly.graph_objects as go
 
 # === Google Sheets Auth ===
 creds_dict = st.secrets["gcp_service_account"]
@@ -14,7 +17,7 @@ sheet_url = "https://docs.google.com/spreadsheets/d/1pWLIfbZzsPe0fTUGday3TZu4dX1
 spreadsheet = client.open_by_url(sheet_url)
 worksheet = spreadsheet.sheet1
 
-st.title("📅 Content Calendar with AI Suggestions")
+st.title("📅 Content Calendar for the cutest social media manager in the world")
 
 # === Load data ===
 data = worksheet.get_all_records()
@@ -59,17 +62,93 @@ st.subheader("📋 Current Calendar with AI Ideas")
 if df.empty:
     st.info("No posts to display.")
 else:
-    st.dataframe(df)
+    # Make sure Date column is datetime
+    df['Date'] = pd.to_datetime(df['Date'])
 
+    # Initialize month and year in session_state
+    if 'month' not in st.session_state:
+        st.session_state.month = datetime.today().month
+    if 'year' not in st.session_state:
+        st.session_state.year = datetime.today().year
+
+    # Functions for navigating months
+    def prev_month():
+        if st.session_state.month == 1:
+            st.session_state.month = 12
+            st.session_state.year -= 1
+        else:
+            st.session_state.month -= 1
+
+    def next_month():
+        if st.session_state.month == 12:
+            st.session_state.month = 1
+            st.session_state.year += 1
+        else:
+            st.session_state.month += 1
+
+    # Navigation buttons
+    col1, col2, col3 = st.columns([1,2,1])
+    with col1:
+        st.button("⬅️ Previous Month", on_click=prev_month)
+    with col3:
+        st.button("Next Month ➡️", on_click=next_month)
+    with col2:
+        st.markdown(f"### {calendar.month_name[st.session_state.month]} {st.session_state.year}")
+
+    # Generate calendar matrix
+    cal = calendar.Calendar(firstweekday=0)
+    month_days = cal.monthdatescalendar(st.session_state.year, st.session_state.month)
+
+    dates = []
+    titles = []
+    for week in month_days:
+        week_dates = []
+        week_titles = []
+        for day in week:
+            week_dates.append(day)
+            # Find posts on this day
+            day_posts = df[df['Date'].dt.date == day]
+            if not day_posts.empty:
+                # Join all titles for hover
+                week_titles.append("\n".join(day_posts['Title'].tolist()))
+            else:
+                week_titles.append("")
+        dates.append(week_dates)
+        titles.append(week_titles)
+
+    header_values = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+    # Display only day numbers, blank out days not in current month
+    display_dates = [[str(d.day) if d.month == st.session_state.month else '' for d in week] for week in dates]
+
+    fig = go.Figure(data=[go.Table(
+        header=dict(
+            values=header_values,
+            fill_color='lightblue',
+            align='center',
+            font=dict(size=14, color='black')
+        ),
+        cells=dict(
+            values=display_dates,
+            fill_color=[['white' if d.month == st.session_state.month else 'lightgrey' for d in week] for week in dates],
+            align='center',
+            font=dict(color='black', size=12),
+            height=60,
+            hovertext=titles,
+            hoverinfo='text',
+        )
+    )])
+
+    fig.update_layout(width=700, height=400, margin=dict(l=10, r=10, t=10, b=10))
+    st.plotly_chart(fig, use_container_width=True)
+
+    # Now keep your AI suggestion below calendar
     titles = df['Title'].tolist()
     selected_title_view = st.selectbox("Select a post to view AI suggestion", titles, key="view_ai_select")
 
-    # Get the row corresponding to the selected title
     row = df[df['Title'] == selected_title_view].iloc[0]
     ai_idea = row.get("AI Idea", "No AI idea available.")
 
     st.markdown(f"### 🤖 AI Suggested Post Idea:\n{ai_idea}")
-
 # --- Edit existing entries ---
 st.subheader("✏️ Edit Existing Post")
 
