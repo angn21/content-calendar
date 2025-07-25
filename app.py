@@ -58,11 +58,11 @@ else:
 # === Tag Distribution Dashboard ===
 st.subheader("🏷️ Tag Distribution Dashboard")
 
-if 'Tag' not in df.columns or df['Tag'].dropna().empty:
+if 'Tags' not in df.columns or df['Tags'].dropna().empty:
     st.info("No tags found in the current data.")
 else:
     # Split multiple tags separated by commas
-    tag_series = df['Tag'].dropna().astype(str).str.split(',')
+    tag_series = df['Tags'].dropna().astype(str).str.split(',')
 
     # Flatten the list and clean whitespace
     all_tags = [tag.strip() for tags in tag_series for tag in tags if tag.strip()]
