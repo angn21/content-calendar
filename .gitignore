@@ -1,0 +1,10 @@
+# Secrets and credentials
+creds.json
+.streamlit/secrets.toml
+
+# Python cache files
+__pycache__/
+*.pyc
+
+# Mac system files
+.DS_Store
