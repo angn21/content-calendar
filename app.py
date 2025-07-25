@@ -1,12 +1,33 @@
 import streamlit as st
+from utils.data_utils import get_worksheet, load_data
 
-st.set_page_config(page_title="Content Calendar", layout="wide")
+worksheet = get_worksheet()
+df = load_data(worksheet)
 
-st.title("📅 Content Calendar")
-st.write("Welcome to your content calendar app. Use the sidebar to navigate.")
+st.sidebar.title("Navigation")
+page = st.sidebar.radio("Go to", ["Add Entry", "View Calendar", "Analytics", "Edit Entry", "Delete Entry"])
 
-st.sidebar.page_link("pages/Analytics.py", label="📊 Analytics")
-st.sidebar.page_link("pages/Edit_Entry.py", label="✏️ Edit Entry")
-st.sidebar.page_link("pages/Delete_Entry.py", label="🗑️ Delete Entry")
-st.sidebar.page_link("pages/Add_Entry.py", label="➕ Add New Post")
-st.sidebar.page_link("pages/View_Calendar.py", label="📋 View Calendar")
+if page == "Add Entry":
+    import pages.add_entry as add_entry
+    st.title("📅 Content Calendar for the cutest social media manager in the world🍵🍓")
+    add_entry.show(worksheet)
+
+elif page == "View Calendar":
+    import pages.view_calendar as view_calendar
+    st.title("📋 Current Calendar with AI Ideas")
+    view_calendar.show(df)
+
+elif page == "Analytics":
+    import pages.analytics as analytics
+    st.title("📊 Analytics Dashboard")
+    analytics.show(df)
+
+elif page == "Edit Entry":
+    import pages.edit_entry as edit_entry
+    st.title("✏️ Edit Existing Post")
+    edit_entry.show(df, worksheet)
+
+elif page == "Delete Entry":
+    import pages.delete_entry as delete_entry
+    st.title("🗑️ Delete a Post")
+    delete_entry.show(df, worksheet)
