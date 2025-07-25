@@ -39,4 +39,4 @@ elif page == "Delete Entry":
 
 elif st.sidebar.button("Refresh Data"):
     st.cache_data.clear()  # This clears all cached data
-    st.experimental_rerun()  # Refresh the app to reload fresh data
+    st.session_state["__rerun"] = True  # Refresh the app to reload fresh data
