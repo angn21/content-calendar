@@ -9,7 +9,7 @@ page = st.sidebar.radio("Go to", ["Add Entry", "View Calendar", "Analytics", "Ed
 
 if page == "Add Entry":
     import pages.add_entry as add_entry
-    st.title("📅 Content Calendar for the cutest social media manager in the world🍵🍓")
+    st.title("Add Entry")
     add_entry.show(worksheet)
 
 elif page == "View Calendar":
