@@ -133,10 +133,10 @@ else:
             align='center',
             font=dict(color='black', size=12),
             height=60,
-            hovertext=titles,
-            hoverinfo='text',
+            # hovertext and hoverinfo removed
         )
     )])
+
 
     fig.update_layout(width=700, height=400, margin=dict(l=10, r=10, t=10, b=10))
     st.plotly_chart(fig, use_container_width=True)
