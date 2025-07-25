@@ -5,7 +5,7 @@ worksheet = get_worksheet()
 df = load_data(worksheet)
 
 st.sidebar.title("Navigation")
-page = st.sidebar.radio("Go to", ["Home", "Add Entry", "View Calendar", "Analytics", "Edit Entry", "Delete Entry", "Refresh Data"])
+page = st.sidebar.radio("Go to", ["Home", "Add Entry", "View Calendar", "Analytics", "Edit Entry", "Delete Entry"])
 
 if page == "Home":
     import pages.home as home
@@ -37,6 +37,15 @@ elif page == "Delete Entry":
     st.title("🗑️ Delete a Post")
     delete_entry.show(df, worksheet)
 
-elif st.sidebar.button("Refresh Data"):
-    st.cache_data.clear()  # This clears all cached data
-    st.session_state["__rerun"] = True  # Refresh the app to reload fresh data
+if "refreshing" not in st.session_state:
+    st.session_state.refreshing = False
+
+if st.sidebar.button("Refresh Data") and not st.session_state.refreshing:
+    st.session_state.refreshing = True
+    st.cache_data.clear()
+    st.session_state["__rerun"] = True
+
+if st.session_state.refreshing:
+    with st.spinner("Refreshing data..."):
+        st.success("✅ Data refreshed!")
+        st.session_state.refreshing = False
