@@ -11,8 +11,8 @@ def get_worksheet():
 
     sheet_url = "https://docs.google.com/spreadsheets/d/1pWLIfbZzsPe0fTUGday3TZu4dX1b8TIG1qihk_dV8pM/edit?usp=sharing"
     spreadsheet = client.open_by_url(sheet_url)
-    _worksheet = spreadsheet.sheet1
-    return _worksheet
+    worksheet = spreadsheet.sheet1
+    return worksheet
 
 @st.cache_data(ttl=600, show_spinner=False)
 def load_data(_worksheet):
