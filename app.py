@@ -5,9 +5,14 @@ worksheet = get_worksheet()
 df = load_data(worksheet)
 
 st.sidebar.title("Navigation")
-page = st.sidebar.radio("Go to", ["Add Entry", "View Calendar", "Analytics", "Edit Entry", "Delete Entry"])
+page = st.sidebar.radio("Go to", ["Home", "Add Entry", "View Calendar", "Analytics", "Edit Entry", "Delete Entry"])
 
-if page == "Add Entry":
+if page == "Home":
+    import pages.home as home
+    st.title("Home")
+    home.show()
+
+elif page == "Add Entry":
     import pages.add_entry as add_entry
     st.title("Add Entry")
     add_entry.show(worksheet)

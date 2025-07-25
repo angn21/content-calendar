@@ -1,9 +1,9 @@
 import streamlit as st
 
-def show_homepage():
+def show():
     st.title("📅 Content Calendar for the cutest social media manager in the world🍵🍓")
     st.markdown("""
-    You got this cutie patootie 
+    You got this cutie patootie 💪
 
     **Currently, you can do these things here:**
     - 🗓️ View and plan content using the calendar
@@ -17,4 +17,4 @@ def show_homepage():
     """)
 
 if __name__ == "__main__":
-    show_homepage()
+    show()
