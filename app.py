@@ -55,6 +55,31 @@ else:
 
     st.bar_chart(status_df.set_index("Status"))
 
+# === Tag Distribution Dashboard ===
+st.subheader("🏷️ Tag Distribution Dashboard")
+
+if 'Tag' not in df.columns or df['Tag'].dropna().empty:
+    st.info("No tags found in the current data.")
+else:
+    # Split multiple tags separated by commas
+    tag_series = df['Tag'].dropna().astype(str).str.split(',')
+
+    # Flatten the list and clean whitespace
+    all_tags = [tag.strip() for tags in tag_series for tag in tags if tag.strip()]
+
+    if not all_tags:
+        st.info("No valid tags to display.")
+    else:
+        tag_counts = pd.Series(all_tags).value_counts()
+
+        # Display top tags
+        st.markdown("**Top Tags by Frequency:**")
+        for tag, count in tag_counts.items():
+            st.write(f"- #{tag}: {count}")
+
+        # Optional: visualize as bar chart
+        st.bar_chart(tag_counts)
+
 
 # === 1. Add New Post ===
 with st.form("add_form"):
