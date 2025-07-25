@@ -23,6 +23,38 @@ df = pd.DataFrame(data)
 # Filter out rows where Title, Date, and Content are all empty
 df = df[df[['Title', 'Date', 'Content']].apply(lambda x: any(str(i).strip() != '' for i in x), axis=1)]
 
+# === Post Status Dashboard ===
+st.subheader("📊 Post Status Dashboard")
+
+if df.empty:
+    st.info("No data to display in dashboard.")
+else:
+    status_counts = df['Status'].value_counts()
+
+    # Ensure all 3 statuses are represented
+    for s in ["Planned", "Scheduled", "Posted"]:
+        if s not in status_counts:
+            status_counts[s] = 0
+
+    st.markdown(f"""
+    - 📝 **Planned:** {status_counts['Planned']}
+    - 📅 **Scheduled:** {status_counts['Scheduled']}
+    - ✅ **Posted:** {status_counts['Posted']}
+    """)
+
+    # Optional: progress bar for % posted
+    total = status_counts.sum()
+    posted_ratio = status_counts["Posted"] / total if total > 0 else 0
+    st.progress(posted_ratio)
+
+    # Bar chart using Streamlit
+    status_df = pd.DataFrame({
+        'Status': status_counts.index,
+        'Count': status_counts.values
+    })
+
+    st.bar_chart(status_df.set_index("Status"))
+
 
 # === 1. Add New Post ===
 with st.form("add_form"):
