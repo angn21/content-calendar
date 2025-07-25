@@ -14,6 +14,7 @@ def get_worksheet():
     worksheet = spreadsheet.sheet1
     return worksheet
 
+@st.cache_data(ttl=600, show_spinner=False)
 def load_data(worksheet):
     data = worksheet.get_all_records()
     df = pd.DataFrame(data)
