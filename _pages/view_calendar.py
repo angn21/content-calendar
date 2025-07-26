@@ -1,5 +1,4 @@
 import streamlit as st
-import streamlit.components.v1 as components
 
 def show(df):
     if df.empty:
@@ -19,51 +18,21 @@ def show(df):
     st.write(ai_idea)
 
     st.markdown("### 🏷️ AI Hashtags")
+
     if ai_hashtags.strip():
         hashtag_list = [tag.strip() for tag in ai_hashtags.split() if tag.strip()]
-        styled_hashtags = " ".join([f"<span class='hashtag'>{tag}</span>" for tag in hashtag_list])
         hashtags_str = " ".join(hashtag_list)
 
-        # Copy button as Streamlit button for interaction
-        if st.button("📋 Copy Hashtags"):
-            # Use JS to copy text to clipboard and show confirmation
-            js_code = f"""
-            <script>
-            navigator.clipboard.writeText("{hashtags_str}").then(() => {{
-                const copyMsg = document.getElementById("copyMsg");
-                if(copyMsg) {{
-                    copyMsg.style.display = "inline";
-                    setTimeout(() => {{copyMsg.style.display = "none";}}, 2000);
-                }}
-            }});
-            </script>
-            """
-            components.html(js_code, height=0, width=0)
-        
-        st.markdown(
-            f"""
-            <div class="hashtag-container">{styled_hashtags}</div>
-            <span id="copyMsg" style="display:none; color: green; font-weight: bold;">Copied to clipboard!</span>
+        # Display hashtags nicely
+        st.markdown(" ".join([f"`{tag}`" for tag in hashtag_list]))
 
-            <style>
-                .hashtag-container {{
-                    margin-top: 5px;
-                    display: flex;
-                    flex-wrap: wrap;
-                    gap: 8px;
-                }}
-                .hashtag {{
-                    background-color: #f0f0f5;
-                    color: #333;
-                    padding: 6px 10px;
-                    border-radius: 20px;
-                    font-size: 14px;
-                    font-family: 'Courier New', monospace;
-                }}
-            </style>
-            """,
-            unsafe_allow_html=True
-        )
+        # Button for "Copy Hashtags"
+        if st.button("📋 Copy Hashtags"):
+            # Put hashtags into a hidden text area for manual copy (Streamlit limitation workaround)
+            st.text_area("Copy the hashtags below:", value=hashtags_str, height=100, key="copy_area")
+
+            # Show confirmation message
+            st.success("✅ Hashtags ready to copy! Select and copy from the box above.")
 
     else:
         st.info("No AI hashtags available for this post.")
