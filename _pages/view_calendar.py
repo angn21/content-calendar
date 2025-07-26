@@ -19,23 +19,35 @@ def show(df):
 
     search_query = st.text_input("Search title/content", "")
 
-    # --- Apply Filters
-    filtered_df = df[
-        df['Platform'].isin(selected_platforms) &
-        df['Status'].isin(selected_statuses)
-    ]
+    # Start with all rows
+    filtered_df = df.copy()
+
+    # Apply OR logic across categories
+    conditions = []
+
+    if selected_platforms:
+        conditions.append(df['Platform'].isin(selected_platforms))
+
+    if selected_statuses:
+        conditions.append(df['Status'].isin(selected_statuses))
 
     if selected_tags:
-        filtered_df = filtered_df[
-            filtered_df['Tags'].apply(lambda x: any(tag in str(x).split(',') for tag in selected_tags))
-        ]
+        conditions.append(df['Tags'].apply(lambda x: any(tag in str(x).split(',') for tag in selected_tags)))
 
     if search_query:
-        search_query_lower = search_query.lower()
-        filtered_df = filtered_df[
-            df['Title'].str.lower().str.contains(search_query_lower) |
-            df['Content'].str.lower().str.contains(search_query_lower)
-        ]
+        query = search_query.lower()
+        conditions.append(
+            df['Title'].str.lower().str.contains(query) |
+            df['Content'].str.lower().str.contains(query)
+        )
+
+    # Combine all conditions with OR
+    if conditions:
+        combined_condition = conditions[0]
+        for cond in conditions[1:]:
+            combined_condition |= cond
+        filtered_df = df[combined_condition]
+
 
     # --- Display
     hidden_cols = ["AI Idea", "AI Hashtags"]  # already hidden as per your last request
@@ -67,7 +79,7 @@ def show(df):
                 st.session_state["copied_tags"] = hashtags_str
 
             if st.session_state.get("copied"):
-                st.success("✅ Hashtags copied to clipboard (use Ctrl+C to copy from below).")
+                st.success("✅ use Cmd+C to copy from below.")
                 st.code(st.session_state.get("copied_tags", ""), language="text")
                 st.session_state["copied"] = False
 
