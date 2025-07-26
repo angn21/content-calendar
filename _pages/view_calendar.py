@@ -28,7 +28,7 @@ def show(df):
 
     search_query = st.text_input("Search title/content", "")
 
-    # Ensure 'Date' column is datetime
+    
     df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
 
     # Start with all rows
