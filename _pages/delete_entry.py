@@ -13,6 +13,7 @@ def show(df, worksheet):
             row_index = int(df.index[df['Title'] == selected_title_delete][0])
             sheet_row_number = row_index + 2  # Account for header row in sheet
             worksheet.delete_rows(sheet_row_number)
+            st.cache_data.clear()
             st.success(f"🗑️ Post '{selected_title_delete}' deleted! Refresh to see the updated table.")
 
             try:

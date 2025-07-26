@@ -51,6 +51,7 @@ def show(df, worksheet):
                         title_edit, str(date_edit), platform_edit, content_edit, status_edit, link_edit, ", ".join(tags_edit),
                         objectives_edit, target_audience_edit, strategy_edit, content_pillars_edit, ctas_edit, row.get("AI Idea", "")
                     ]])
+                    st.cache_data.clear()
                     st.success("✅ Updated successfully! Refresh to see changes.")
 
                     del st.session_state['editing_post']

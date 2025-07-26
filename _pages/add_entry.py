@@ -24,4 +24,5 @@ def show(worksheet):
                 objectives, target_audience, strategy, content_pillars, ctas, ""
             ]
             worksheet.append_row(new_row)
+            st.cache_data.clear()
             st.success("✅ Added new post! Refresh to see updates.")
