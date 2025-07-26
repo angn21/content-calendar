@@ -9,7 +9,7 @@ def show():
     - 🗓️ View and plan content using the calendar
     - ✏️ Edit or delete existing entries to the calendar
     - 📊 Monitor post statuses and tag distribution in the analytics dashboard
-    - 🤖 View AI-suggested post ideas and hashtag
+    - 🤖 View AI-suggested post ideas and hashtags
 
     Use the sidebar to navigate between features.
     
