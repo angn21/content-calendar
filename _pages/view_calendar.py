@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 
 def show(df):
     if df.empty:
@@ -17,7 +18,18 @@ def show(df):
     selected_statuses = st.multiselect("Status", status_options, default=status_options)
     selected_tags = st.multiselect("Tags (any match)", sorted(all_tags))
 
+    # 📅 Date range filter
+    with st.expander("📆 Filter by Date"):
+        col1, col2 = st.columns(2)
+        with col1:
+            start_date = st.date_input("Start Date", value=None)
+        with col2:
+            end_date = st.date_input("End Date", value=None)
+
     search_query = st.text_input("Search title/content", "")
+
+    # Ensure 'Date' column is datetime
+    df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
 
     # Start with all rows
     filtered_df = df.copy()
@@ -41,13 +53,18 @@ def show(df):
             df['Content'].str.lower().str.contains(query)
         )
 
-    # Combine all conditions with OR
+    # Apply date filters (AND logic for date range)
+    if start_date:
+        filtered_df = filtered_df[filtered_df['Date'] >= pd.to_datetime(start_date)]
+    if end_date:
+        filtered_df = filtered_df[filtered_df['Date'] <= pd.to_datetime(end_date)]
+
+    # Combine OR filters
     if conditions:
         combined_condition = conditions[0]
         for cond in conditions[1:]:
             combined_condition |= cond
-        filtered_df = df[combined_condition]
-
+        filtered_df = filtered_df[combined_condition]
 
     # --- Display
     hidden_cols = ["AI Idea", "AI Hashtags"]  # already hidden as per your last request
