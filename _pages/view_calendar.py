@@ -5,7 +5,11 @@ def show(df):
         st.info("No posts to display.")
         return
 
-    st.dataframe(df)
+    # Drop AI content and AI hashtags columns before showing the table
+    cols_to_hide = ["AI Idea", "AI Hashtags"]
+    df_display = df.drop(columns=[col for col in cols_to_hide if col in df.columns])
+
+    st.dataframe(df_display)
 
     titles = df['Title'].tolist()
     selected_title_view = st.selectbox("Select a post to view AI content", titles, key="view_ai_select")
