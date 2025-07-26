@@ -15,33 +15,35 @@ def show(df):
     ai_idea = row.get("AI Idea", "No AI idea available.")
     ai_hashtags = row.get("AI Hashtags", "")
 
-    # AI Post Idea
     st.markdown("### 🤖 AI Suggested Post Idea")
     st.write(ai_idea)
 
-    # AI Hashtags
     st.markdown("### 🏷️ AI Hashtags")
     if ai_hashtags.strip():
         hashtag_list = [tag.strip() for tag in ai_hashtags.split() if tag.strip()]
         styled_hashtags = " ".join([f"<span class='hashtag'>{tag}</span>" for tag in hashtag_list])
         hashtags_str = " ".join(hashtag_list)
 
-        # Display with styling
+        # Copy button as Streamlit button for interaction
+        if st.button("📋 Copy Hashtags"):
+            # Use JS to copy text to clipboard and show confirmation
+            js_code = f"""
+            <script>
+            navigator.clipboard.writeText("{hashtags_str}").then(() => {{
+                const copyMsg = document.getElementById("copyMsg");
+                if(copyMsg) {{
+                    copyMsg.style.display = "inline";
+                    setTimeout(() => {{copyMsg.style.display = "none";}}, 2000);
+                }}
+            }});
+            </script>
+            """
+            components.html(js_code, height=0, width=0)
+        
         st.markdown(
             f"""
             <div class="hashtag-container">{styled_hashtags}</div>
-            <button onclick="navigator.clipboard.writeText('{hashtags_str}')"
-                style="
-                    margin-top: 10px;
-                    padding: 6px 12px;
-                    background-color: #4CAF50;
-                    color: white;
-                    border: none;
-                    border-radius: 6px;
-                    cursor: pointer;
-                ">
-                📋 Copy Hashtags
-            </button>
+            <span id="copyMsg" style="display:none; color: green; font-weight: bold;">Copied to clipboard!</span>
 
             <style>
                 .hashtag-container {{
@@ -62,5 +64,6 @@ def show(df):
             """,
             unsafe_allow_html=True
         )
+
     else:
         st.info("No AI hashtags available for this post.")
