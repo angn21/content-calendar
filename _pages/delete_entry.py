@@ -14,7 +14,7 @@ def show(df, worksheet):
             sheet_row_number = row_index + 2  # Account for header row in sheet
             worksheet.delete_rows(sheet_row_number)
             st.cache_data.clear()
-            st.success(f"🗑️ Post '{selected_title_delete}' deleted! Refresh to see the updated table.")
+            st.success(f"🗑️ Post '{selected_title_delete}' deleted!")
 
             try:
                 st.experimental_rerun()

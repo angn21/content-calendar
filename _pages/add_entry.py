@@ -25,4 +25,4 @@ def show(worksheet):
             ]
             worksheet.append_row(new_row)
             st.cache_data.clear()
-            st.success("✅ Added new post! Refresh to see updates.")
+            st.success("✅ Added new post!")

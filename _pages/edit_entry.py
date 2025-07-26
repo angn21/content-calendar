@@ -52,6 +52,6 @@ def show(df, worksheet):
                         objectives_edit, target_audience_edit, strategy_edit, content_pillars_edit, ctas_edit, row.get("AI Idea", "")
                     ]])
                     st.cache_data.clear()
-                    st.success("✅ Updated successfully! Refresh to see changes.")
+                    st.success("✅ Updated successfully!")
 
                     del st.session_state['editing_post']
