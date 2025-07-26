@@ -5,38 +5,95 @@ def show(df):
         st.info("No posts to display.")
         return
 
-    # Drop AI content and AI hashtags columns before showing the table
-    cols_to_hide = ["AI Idea", "AI Hashtags"]
-    df_display = df.drop(columns=[col for col in cols_to_hide if col in df.columns])
+    st.markdown("### 🔍 Filter & Search")
 
-    st.dataframe(df_display)
+    # --- Extract filter options
+    platform_options = sorted(df['Platform'].dropna().unique())
+    status_options = sorted(df['Status'].dropna().unique())
+    all_tags = set(tag.strip() for tags in df['Tags'].dropna() for tag in str(tags).split(','))
 
-    titles = df['Title'].tolist()
-    selected_title_view = st.selectbox("Select a post to view AI content", titles, key="view_ai_select")
+    # --- UI Filters
+    selected_platforms = st.multiselect("Platform", platform_options, default=platform_options)
+    selected_statuses = st.multiselect("Status", status_options, default=status_options)
+    selected_tags = st.multiselect("Tags (any match)", sorted(all_tags))
 
-    row = df[df['Title'] == selected_title_view].iloc[0]
-    ai_idea = row.get("AI Idea", "No AI idea available.")
-    ai_hashtags = row.get("AI Hashtags", "")
+    search_query = st.text_input("Search title/content", "")
 
-    st.markdown("### 🤖 AI Suggested Post Idea")
-    st.write(ai_idea)
+    # --- Apply Filters
+    filtered_df = df[
+        df['Platform'].isin(selected_platforms) &
+        df['Status'].isin(selected_statuses)
+    ]
 
-    st.markdown("### 🏷️ AI Hashtags")
+    if selected_tags:
+        filtered_df = filtered_df[
+            filtered_df['Tags'].apply(lambda x: any(tag in str(x).split(',') for tag in selected_tags))
+        ]
 
-    if ai_hashtags.strip():
-        hashtag_list = [tag.strip() for tag in ai_hashtags.split() if tag.strip()]
-        hashtags_str = " ".join(hashtag_list)
+    if search_query:
+        search_query_lower = search_query.lower()
+        filtered_df = filtered_df[
+            df['Title'].str.lower().str.contains(search_query_lower) |
+            df['Content'].str.lower().str.contains(search_query_lower)
+        ]
 
-        # Display hashtags nicely
-        st.markdown(" ".join([f"`{tag}`" for tag in hashtag_list]))
+    # --- Display
+    hidden_cols = ["AI Idea", "AI Hashtags"]  # already hidden as per your last request
+    filtered_display_df = filtered_df.drop(columns=[col for col in hidden_cols if col in filtered_df.columns])
 
-        # Button for "Copy Hashtags"
-        if st.button("📋 Copy Hashtags"):
-            # Put hashtags into a hidden text area for manual copy (Streamlit limitation workaround)
-            st.text_area("Copy the hashtags below:", value=hashtags_str, height=100, key="copy_area")
+    st.markdown("### 📅 Your Posts")
+    st.dataframe(filtered_display_df, use_container_width=True)
 
-            # Show confirmation message
-            st.success("✅ Hashtags ready to copy! Select and copy from the box above.")
+    if not filtered_df.empty:
+        # Rest of your logic (selectbox, AI idea + hashtags, etc.)
+        titles = filtered_df['Title'].tolist()
+        selected_title_view = st.selectbox("Select a post to view AI content", titles, key="view_ai_select")
 
+        row = filtered_df[filtered_df['Title'] == selected_title_view].iloc[0]
+        ai_idea = row.get("AI Idea", "No AI idea available.")
+        ai_hashtags = row.get("AI Hashtags", "")
+
+        st.markdown("### 🤖 AI Suggested Post Idea")
+        st.write(ai_idea)
+
+        st.markdown("### 🏷️ AI Hashtags")
+        if ai_hashtags.strip():
+            hashtag_list = [tag.strip() for tag in ai_hashtags.split() if tag.strip()]
+            styled_hashtags = " ".join([f"<span class='hashtag'>{tag}</span>" for tag in hashtag_list])
+            hashtags_str = " ".join(hashtag_list)
+
+            if st.button("📋 Copy Hashtags"):
+                st.session_state["copied"] = True
+                st.session_state["copied_tags"] = hashtags_str
+
+            if st.session_state.get("copied"):
+                st.success("✅ Hashtags copied to clipboard (use Ctrl+C to copy from below).")
+                st.code(st.session_state.get("copied_tags", ""), language="text")
+                st.session_state["copied"] = False
+
+            st.markdown(
+                f"""
+                <div class="hashtag-container">{styled_hashtags}</div>
+                <style>
+                    .hashtag-container {{
+                        margin-top: 5px;
+                        display: flex;
+                        flex-wrap: wrap;
+                        gap: 8px;
+                    }}
+                    .hashtag {{
+                        background-color: #f0f0f5;
+                        color: #333;
+                        padding: 6px 10px;
+                        border-radius: 20px;
+                        font-size: 14px;
+                        font-family: 'Courier New', monospace;
+                    }}
+                </style>
+                """,
+                unsafe_allow_html=True
+            )
+        else:
+            st.info("No AI hashtags available for this post.")
     else:
-        st.info("No AI hashtags available for this post.")
+        st.info("No posts match your filters.")
