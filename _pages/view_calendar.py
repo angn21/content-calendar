@@ -69,7 +69,10 @@ def show(df):
     # --- Display
     hidden_cols = ["AI Idea", "AI Hashtags"]  # already hidden as per your last request
     filtered_display_df = filtered_df.drop(columns=[col for col in hidden_cols if col in filtered_df.columns])
-
+    
+    # Format the date column to exclude time
+    filtered_display_df['Date'] = filtered_display_df['Date'].dt.date
+    
     st.markdown("### 📅 Your Posts")
     st.dataframe(filtered_display_df, use_container_width=True)
 
