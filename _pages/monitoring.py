@@ -85,7 +85,7 @@ def show():
                 x=1.02,      # slightly outside right border
                 y=0.5,       # vertically centered
                 xanchor='left',
-                yanchor='middle',
+                yanchor='bottom',
                 bgcolor='rgba(255,255,255,0)',  # transparent background
                 bordercolor='rgba(0,0,0,0)'     # no border
             ),
