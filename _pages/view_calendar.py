@@ -110,9 +110,9 @@ def show(df):
 
     # Status-color mapping
     status_colors = {
-        "Planned": "#F7E759",   # Light yellow
-        "Scheduled": "#5DC5F5", # Light blue
-        "Posted": "#54E378",    # Light green
+        "Planned": "#FFF9C4",   # Light yellow
+        "Scheduled": "#B3E5FC", # Light blue
+        "Posted": "#C8E6C9",    # Light green
         "default": "#E0E0E0"    # Fallback gray
     }
 
