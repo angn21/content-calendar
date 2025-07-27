@@ -102,7 +102,6 @@ def show(df):
             margin: 4px 0;
             padding: 4px 6px;
             font-size: 13px;
-            colour: black;
         }
         </style>
     """, unsafe_allow_html=True)
@@ -122,8 +121,17 @@ def show(df):
         html += "</tr>"
     html += "</table>"
 
-    st.markdown(html, unsafe_allow_html=True)
-
+    st.markdown(
+        f"""
+        <style>
+            table {{
+                color: black !important;
+            }}
+        </style>
+        {html}
+        """,
+        unsafe_allow_html=True
+)
     # --- Display
     hidden_cols = ["AI Idea", "AI Hashtags"]  # already hidden as per your last request
     filtered_display_df = filtered_df.drop(columns=[col for col in hidden_cols if col in filtered_df.columns])
