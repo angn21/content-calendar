@@ -1,5 +1,7 @@
 import streamlit as st
 import pandas as pd
+import calendar
+from datetime import datetime
 
 def show(df):
     if df.empty:
@@ -28,7 +30,6 @@ def show(df):
 
     search_query = st.text_input("Search title/content", "")
 
-    
     df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
 
     # Start with all rows
@@ -66,13 +67,69 @@ def show(df):
             combined_condition |= cond
         filtered_df = filtered_df[combined_condition]
 
+    # --- Calendar View ---
+    st.markdown("### 🗓️ Calendar View")
+    today = datetime.today()
+    year = st.selectbox("Select Year", range(today.year - 2, today.year + 3), index=2)
+    month = st.selectbox("Select Month", list(calendar.month_name)[1:], index=today.month - 1)
+
+    month_index = list(calendar.month_name).index(month)
+    cal = calendar.monthcalendar(year, month_index)
+    df_month = filtered_df[(filtered_df['Date'].dt.year == year) & (filtered_df['Date'].dt.month == month_index)]
+
+    days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    st.markdown("""
+        <style>
+        table.calendar {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table.calendar th, table.calendar td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            vertical-align: top;
+            min-height: 80px;
+        }
+        table.calendar td {
+            height: 100px;
+        }
+        .day-label {
+            font-weight: bold;
+        }
+        .post-item {
+            background-color: #eef;
+            border-radius: 6px;
+            margin: 4px 0;
+            padding: 4px 6px;
+            font-size: 13px;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
+    html = "<table class='calendar'>"
+    html += "<tr>" + "".join(f"<th>{day}</th>" for day in days) + "</tr>"
+
+    for week in cal:
+        html += "<tr>"
+        for day in week:
+            if day == 0:
+                html += "<td></td>"
+            else:
+                posts_today = df_month[df_month['Date'].dt.day == day]
+                items = "".join(f"<div class='post-item'>{row['Title']}</div>" for _, row in posts_today.iterrows())
+                html += f"<td><span class='day-label'>{day}</span>{items}</td>"
+        html += "</tr>"
+    html += "</table>"
+
+    st.markdown(html, unsafe_allow_html=True)
+
     # --- Display
     hidden_cols = ["AI Idea", "AI Hashtags"]  # already hidden as per your last request
     filtered_display_df = filtered_df.drop(columns=[col for col in hidden_cols if col in filtered_df.columns])
-    
+
     # Format the date column to exclude time
     filtered_display_df['Date'] = filtered_display_df['Date'].dt.date
-    
+
     st.markdown("### 📅 Your Posts")
     st.dataframe(filtered_display_df, use_container_width=True)
 
