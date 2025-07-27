@@ -1,5 +1,4 @@
 import streamlit as st
-import streamlit.components.v1 as components
 import pandas as pd
 
 def show(df):
@@ -80,40 +79,9 @@ def show(df):
             lambda url: f"[🔗 Link]({url})" if pd.notna(url) and url.startswith("http") else ""
         )
 
-    # Convert DataFrame to HTML
-    html_table = filtered_display_df.to_html(index=False, escape=False)
-
-    # Get column index of "Content"
-    content_col_index = filtered_display_df.columns.get_loc("Content") + 1  # nth-child is 1-based
-
-    # Add custom CSS for the Content column
-    styled_html = f"""
-    <style>
-    table {{
-        width: 100%;
-        border-collapse: collapse;
-        font-family: sans-serif;
-        color: white; 
-    }}
-    th, td {{
-        text-align: left;
-        padding: 8px;
-        border: 1px solid #ddd;
-        color: white; 
-    }}
-    td:nth-child({content_col_index}) {{
-        min-width: 300px;
-        max-width: 500px;
-        white-space: pre-wrap;
-        word-break: break-word;
-    }}
-    </style>
-    {html_table}
-    """
-
-    # Display table with proper HTML rendering
+    # Render as markdown table
     st.markdown("### 📅 Your Posts")
-    components.html(styled_html, height=600, scrolling=True)
+    st.markdown(filtered_display_df.to_markdown(index=False), unsafe_allow_html=True)
 
 
     if not filtered_df.empty:
