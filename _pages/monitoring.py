@@ -2,9 +2,6 @@ import streamlit as st
 import pandas as pd
 from utils.data_utils import get_worksheet  
 import plotly.graph_objects as go
-from google.cloud import monitoring_v3
-from google.oauth2 import service_account
-from datetime import datetime, timedelta, timezone
 
 # --- Get the Monitoring worksheet ---
 @st.cache_data(ttl = 60, show_spinner=False)
@@ -13,50 +10,6 @@ def load_data():
     data = worksheet.get_all_records()
     df = pd.DataFrame(data)
     return df
-
-def fetch_cloud_metrics():
-    creds_dict = st.secrets["gcp_service_account"]
-    credentials = service_account.Credentials.from_service_account_info(creds_dict)
-    
-    client = monitoring_v3.MetricServiceClient(credentials=credentials)
-    project_id = "content-calendar-467008"
-    project_name = f"projects/{project_id}"
-    
-    now = datetime.now(timezone.utc)
-    start_time = now - timedelta(hours=1)
-
-    interval = monitoring_v3.TimeInterval(
-        end_time=now,
-        start_time=start_time
-    )
-
-    aggregation = monitoring_v3.Aggregation(
-        alignment_period={"seconds": 300},  # 5 minutes
-        per_series_aligner=monitoring_v3.Aggregation.Aligner.ALIGN_MEAN
-    )
-
-    def query_metric(metric_type, filter_extra=""):
-        filter_str = f'metric.type = "{metric_type}" {filter_extra}'
-        results = client.list_time_series(
-            request={
-                "name": project_name,
-                "filter": filter_str,
-                "interval": interval,
-                "view": monitoring_v3.ListTimeSeriesRequest.TimeSeriesView.FULL,
-                "aggregation": aggregation,
-            }
-        )
-        return [(point.interval.end_time.ToDatetime(), point.value.double_value)
-                for series in results for point in series.points]
-
-    latency = query_metric("serviceruntime.googleapis.com/api/request_latencies")
-    request_count = query_metric("serviceruntime.googleapis.com/api/request_count")
-    error_count = query_metric(
-        "serviceruntime.googleapis.com/api/request_count",
-        "AND (metric.label.response_code_class = \"4xx\" OR metric.label.response_code_class = \"5xx\")"
-    )
-
-    return latency, request_count, error_count
 
 def show():
     df = load_data()
@@ -141,18 +94,6 @@ def show():
         )
 
         st.plotly_chart(fig, use_container_width=True)
-
-        latency, request_count, error_count = fetch_cloud_metrics()
-        if latency:
-            st.metric("Avg Latency (ms)", f"{pd.DataFrame(latency)[1].mean():.2f}")
-        if request_count:
-            st.metric("Request Count", f"{sum([v for _, v in request_count])}")
-        if request_count and error_count:
-            total = sum([v for _, v in request_count])
-            errs = sum([v for _, v in error_count])
-            err_rate = (errs / total) * 100 if total else 0
-            st.metric("API Error Rate", f"{err_rate:.2f}%")
-
         # --- Raw Logs ---
         with st.expander("View Raw Logs"):
             st.dataframe(df)
