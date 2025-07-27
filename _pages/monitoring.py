@@ -28,41 +28,52 @@ def show():
 
         st.subheader("Execution Timeline")
 
-        # Prepare data
-        df["Date"] = df["Timestamp"].dt.date
-        daily_summary = df.groupby("Date").agg(
-            Executions=("Status", "count"),
-            Errors=("Status", lambda x: x.str.contains("Error", case=False, na=False).sum())
-        ).reset_index()
-        daily_summary["ErrorRate"] = (daily_summary["Errors"] / daily_summary["Executions"]) * 100
+        # Prepare data (ensure it's sorted by timestamp)
+        df = df.sort_values("Timestamp")
+        df["DateTime"] = df["Timestamp"].dt.floor("T")  # round to nearest minute
 
-        # Create plot
+        # Define success statuses
+        success_statuses = ["AI Hashtag - No Update", "AI Formula - No Update"]
+
+        # Success is 1 if status contains any of success_statuses, else 0
+        df["Success"] = df["Status"].apply(
+            lambda x: 1 if any(success in x for success in success_statuses) else 0
+        )
+
+        # Resample to fixed intervals (e.g. 5 min) and fill gaps with 0 (fail)
+        df_resampled = df.set_index("DateTime").resample("5min").agg({
+            "Success": "mean"
+        }).fillna(0).reset_index()
+
+        # Rolling error rate (over last N entries)
+        rolling_window = 6  # adjust as needed
+        df_resampled["ErrorRate"] = 100 * (1 - df_resampled["Success"].rolling(rolling_window, min_periods=1).mean())
+
+        # Plotly figure with dual y-axis
         fig = go.Figure()
 
-        # Bar for Executions
-        fig.add_trace(go.Bar(
-            x=daily_summary["Date"],
-            y=daily_summary["Executions"],
-            name="Executions",
-            marker_color="steelblue",
+        fig.add_trace(go.Scatter(
+            x=df_resampled["DateTime"],
+            y=df_resampled["Success"],
+            name="Run Success (1 = OK)",
+            mode="lines+markers",
+            line=dict(color="seagreen"),
             yaxis="y1"
         ))
 
-        # Line for Error Rate
         fig.add_trace(go.Scatter(
-            x=daily_summary["Date"],
-            y=daily_summary["ErrorRate"],
-            name="Error Rate (%)",
+            x=df_resampled["DateTime"],
+            y=df_resampled["ErrorRate"],
+            name="Rolling Error Rate (%)",
             mode="lines+markers",
-            marker_color="firebrick",
+            line=dict(color="firebrick"),
             yaxis="y2"
         ))
 
-        # Layout
         fig.update_layout(
-            title="Daily Executions and Error Rate",
-            xaxis=dict(title="Date"),
-            yaxis=dict(title="Executions", side="left"),
+            title="Automation Status and Error Rate",
+            xaxis=dict(title="Time"),
+            yaxis=dict(title="Run Success", range=[-0.1, 1.1]),
             yaxis2=dict(
                 title="Error Rate (%)",
                 overlaying="y",
@@ -73,6 +84,7 @@ def show():
             legend=dict(x=0.01, y=0.99),
             height=450
         )
+
         st.plotly_chart(fig, use_container_width=True)
         # --- Raw Logs ---
         with st.expander("View Raw Logs"):
