@@ -53,7 +53,7 @@ elif page == "Analytics":
 
 elif page == "Edit Post":
     import _pages.edit_entry as edit_entry
-    st.title("✏️ Edit Existing Post")
+    st.title("✏️ Edit an Existing Post")
     edit_entry.show(df, worksheet)
 
 elif page == "Delete Post":
