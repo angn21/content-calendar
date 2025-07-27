@@ -99,7 +99,6 @@ def show(df):
             font-weight: bold;
         }
         .post-item {
-            background-color: #eef;
             border-radius: 6px;
             margin: 4px 0;
             padding: 4px 6px;
@@ -108,6 +107,14 @@ def show(df):
         }
         </style>
     """, unsafe_allow_html=True)
+
+    # Status-color mapping
+    status_colors = {
+        "Planned": "#FFF9C4",   # Light yellow
+        "Scheduled": "#B3E5FC", # Light blue
+        "Posted": "#C8E6C9",    # Light green
+        "default": "#E0E0E0"    # Fallback gray
+    }
 
     html = "<table class='calendar'>"
     html += "<tr>" + "".join(f"<th>{day}</th>" for day in days) + "</tr>"
@@ -119,10 +126,25 @@ def show(df):
                 html += "<td></td>"
             else:
                 posts_today = df_month[df_month['Date'].dt.day == day]
-                items = "".join(f"<div class='post-item'>{row['Title']}</div>" for _, row in posts_today.iterrows())
+                items = ""
+                for _, row in posts_today.iterrows():
+                    status = row.get("Status", "default")
+                    color = status_colors.get(status, status_colors["default"])
+                    items += f"<div class='post-item' style='background-color: {color};'>{row['Title']}</div>"
                 html += f"<td><span class='day-label'>{day}</span>{items}</td>"
         html += "</tr>"
     html += "</table>"
+    # Add legend for status colors
+    html += """
+    <div style='margin-top: 16px;'>
+        <strong>Status Legend:</strong>
+        <div style='display: flex; gap: 12px; margin-top: 8px; flex-wrap: wrap;'>
+            <div style='background-color: #FFF9C4; padding: 6px 12px; border-radius: 8px;'>🟡 Planned</div>
+            <div style='background-color: #B3E5FC; padding: 6px 12px; border-radius: 8px;'>🔵 Scheduled</div>
+            <div style='background-color: #C8E6C9; padding: 6px 12px; border-radius: 8px;'>🟢 Posted</div>
+        </div>
+    </div>
+    """
 
     st.markdown(html, unsafe_allow_html=True)
 
