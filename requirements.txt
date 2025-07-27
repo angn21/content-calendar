@@ -4,4 +4,5 @@ oauth2client
 pandas
 plotly
 tabulate>=0.8.9
+google-cloud-monitoring
 
