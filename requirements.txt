@@ -3,3 +3,5 @@ gspread
 oauth2client
 pandas
 plotly
+tabulate>=0.8.9
+
