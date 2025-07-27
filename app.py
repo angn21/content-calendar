@@ -33,17 +33,17 @@ page = st.sidebar.radio("Go to", ["Home", "Add Entry", "Edit Entry", "Delete Ent
 
 if page == "Home":
     import _pages.home as home
-    st.title("Home")
+    st.title("🏠 Home")
     home.show()
 
 elif page == "Add Entry":
     import _pages.add_entry as add_entry
-    st.title("Add Entry")
+    st.title("➕ Add Entry")
     add_entry.show(worksheet)
 
 elif page == "Calendar":
     import _pages.view_calendar as view_calendar
-    st.title("📋 Current Calendar with AI Ideas")
+    st.title("📋 Current Calendar")
     view_calendar.show(df)
 
 elif page == "Analytics":

@@ -2,8 +2,6 @@ import streamlit as st
 import pandas as pd
 
 def show(df, worksheet):
-    st.subheader("✏️ Edit Existing Post")
-
     if df.empty:
         st.info("No posts yet.")
     else:

@@ -2,7 +2,6 @@ import streamlit as st
 
 def show(worksheet):
     with st.form("add_form"):
-        st.subheader("➕ Add New Post")
         title = st.text_input("Post Title")  
         date = st.date_input("Post Date")
         platform = st.selectbox("Platform", ["Instagram", "Facebook", "TikTok", "LinkedIn"])

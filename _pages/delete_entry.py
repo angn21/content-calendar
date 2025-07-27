@@ -1,8 +1,6 @@
 import streamlit as st
 
 def show(df, worksheet):
-    st.subheader("🗑️ Delete a Post")
-
     if df.empty:
         st.info("No posts to delete.")
     else:
