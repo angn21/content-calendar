@@ -40,7 +40,7 @@ elif page == "Delete Entry":
 elif page == "AI Ideas":
     import _pages.ai_ideas as ai_ideas
     st.title("🧠 AI Content Explorer")
-    ai_ideas.show(df, worksheet)
+    ai_ideas.show(df)
 
 if "refreshing" not in st.session_state:
     st.session_state.refreshing = False
