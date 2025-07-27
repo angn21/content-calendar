@@ -7,13 +7,13 @@ st.title("📊 Monitoring Dashboard")
 
 # --- Get the Monitoring worksheet ---
 @st.cache_data(ttl = 60, show_spinner=False)
-def load_monitoring_data():
+def load_data():
     worksheet = get_worksheet().spreadsheet.worksheet("Monitoring")
     data = worksheet.get_all_records()
     df = pd.DataFrame(data)
     return df
 
-df = load_monitoring_data()
+df = load_data()
 
 def show():
     # --- Clean and prepare data ---
