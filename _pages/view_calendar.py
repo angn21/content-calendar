@@ -81,7 +81,7 @@ def show(df):
 
     # Render as markdown table
     st.markdown("### 📅 Your Posts")
-    st.markdown(filtered_display_df.to_markdown(index=False), unsafe_allow_html=True)
+    st.dataframe(filtered_display_df, use_container_width=True)
 
 
     if not filtered_df.empty:
