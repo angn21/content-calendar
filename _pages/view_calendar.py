@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import pandas as pd
 
 def show(df):
@@ -82,16 +83,16 @@ def show(df):
     # Convert DataFrame to HTML
     html_table = filtered_display_df.to_html(index=False, escape=False)
 
-    # Inject a wider style for the 'Content' column
-    # You can do this by targeting the nth-child of the column (assuming you know its index)
-    content_col_index = filtered_display_df.columns.get_loc("Content") + 1  # +1 because nth-child is 1-based
+    # Get column index of "Content"
+    content_col_index = filtered_display_df.columns.get_loc("Content") + 1  # nth-child is 1-based
 
-    # Style the Content column using nth-child
+    # Add custom CSS for the Content column
     styled_html = f"""
     <style>
     table {{
         width: 100%;
         border-collapse: collapse;
+        font-family: sans-serif;
     }}
     th, td {{
         text-align: left;
@@ -108,10 +109,9 @@ def show(df):
     {html_table}
     """
 
-    # Render styled HTML table
+    # Display table with proper HTML rendering
     st.markdown("### 📅 Your Posts")
-    st.markdown(styled_html, unsafe_allow_html=True)
-
+    components.html(styled_html, height=600, scrolling=True)
 
 
     if not filtered_df.empty:
