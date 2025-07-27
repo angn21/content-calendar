@@ -93,11 +93,13 @@ def show(df):
         width: 100%;
         border-collapse: collapse;
         font-family: sans-serif;
+        color: white; 
     }}
     th, td {{
         text-align: left;
         padding: 8px;
         border: 1px solid #ddd;
+        color: white; 
     }}
     td:nth-child({content_col_index}) {{
         min-width: 300px;
