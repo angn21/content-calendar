@@ -2,7 +2,7 @@ import streamlit as st
 
 import pandas as pd
 
-def show_ai_ideas(df):
+def show(df):
     st.markdown("## 🧠 AI Content Explorer")
 
     if not df.empty:
