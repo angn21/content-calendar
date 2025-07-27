@@ -20,13 +20,13 @@ def show():
         errors = df["Status"].str.contains("Error", case=False, na=False).sum()
         error_rate = (errors / total_runs) * 100 if total_runs else 0
 
+        st.subheader("Sheets Automation Health")
+
         # --- Display Metrics ---
         col1, col2, col3 = st.columns(3)
         col1.metric("Total Executions", total_runs)
         col2.metric("Errors", errors)
         col3.metric("Error Rate", f"{error_rate:.1f}%")
-
-        st.subheader("Execution Timeline")
 
         # Prepare data (ensure it's sorted by timestamp)
         df = df.sort_values("Timestamp")
@@ -81,7 +81,15 @@ def show():
                 showgrid=False,
                 range=[0, 100]
             ),
-            legend=dict(x=0.01, y=0.99),
+            legend=dict(
+                x=1.02,      # slightly outside right border
+                y=0.5,       # vertically centered
+                xanchor='left',
+                yanchor='middle',
+                bgcolor='rgba(255,255,255,0)',  # transparent background
+                bordercolor='rgba(0,0,0,0)'     # no border
+            ),
+            margin=dict(r=100), 
             height=450
         )
 
