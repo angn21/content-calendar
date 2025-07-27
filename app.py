@@ -47,13 +47,13 @@ elif page == "Monitoring":
     st.title("📈 Monitoring Dashboard")
     monitoring.show()
 
-if "refreshing" not in st.session_state:
+if "refresh_token" not in st.session_state:
+    st.session_state.refresh_token = 0
     st.session_state.refreshing = False
 
 if st.sidebar.button("Refresh Data") and not st.session_state.refreshing:
     st.session_state.refreshing = True
-    st.cache_data.clear()
-    st.session_state["__rerun"] = True
+    st.session_state.refresh_token += 1
 
 if st.session_state.refreshing:
     with st.spinner("Refreshing data..."):

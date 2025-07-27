@@ -5,15 +5,18 @@ from utils.data_utils import get_worksheet  # Adjust the import path if needed
 st.set_page_config(page_title="Monitoring Dashboard", layout="wide")
 st.title("📊 Monitoring Dashboard")
 
+if "refresh_token" not in st.session_state:
+    st.session_state.refresh_token = 0
+
 # --- Get the Monitoring worksheet ---
 @st.cache_data(ttl = 60, show_spinner=False)
-def load_data():
+def load_data(refresh_token):
     worksheet = get_worksheet().spreadsheet.worksheet("Monitoring")
     data = worksheet.get_all_records()
     df = pd.DataFrame(data)
     return df
 
-df = load_data()
+df = load_data(st.session_state.refresh_token)
 
 def show():
     # --- Clean and prepare data ---
