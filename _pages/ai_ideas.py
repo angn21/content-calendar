@@ -18,9 +18,20 @@ def show(df):
 
         st.markdown("### AI Hashtags")
         if ai_hashtags.strip():
-            hashtag_list = [tag.strip() for tag in ai_hashtags.split() if tag.strip()]
-            styled_hashtags = " ".join([f"<span class='hashtag'>{tag}</span>" for tag in hashtag_list])
-            hashtags_str = " ".join(hashtag_list)
+            import re
+
+            # Extract categories and hashtags
+            categories = ["Popular", "Niche", "Trending", "Branded"]
+            categorized_tags = {cat: [] for cat in categories}
+
+            for match in re.finditer(r"(Popular|Niche|Trending|Branded):\s*(.*?)\s*(?=(Popular|Niche|Trending|Branded|$))", ai_hashtags, re.DOTALL):
+                category, tags = match.group(1), match.group(2)
+                tag_list = [tag.strip() for tag in tags.split() if tag.strip()]
+                categorized_tags[category] = tag_list
+
+            # Flatten all tags for copy function
+            all_hashtags = [tag for tags in categorized_tags.values() for tag in tags]
+            hashtags_str = " ".join(all_hashtags)
 
             if st.button("📋 Copy Hashtags"):
                 st.session_state["copied"] = True
@@ -31,29 +42,35 @@ def show(df):
                 st.code(st.session_state.get("copied_tags", ""), language="text")
                 st.session_state["copied"] = False
 
-            st.markdown(
-                f"""
-                <div class="hashtag-container">{styled_hashtags}</div>
-                <style>
-                    .hashtag-container {{
-                        margin-top: 5px;
-                        display: flex;
-                        flex-wrap: wrap;
-                        gap: 8px;
-                    }}
-                    .hashtag {{
-                        background-color: #f0f0f5;
-                        color: #333;
-                        padding: 6px 10px;
-                        border-radius: 20px;
-                        font-size: 14px;
-                        font-family: 'Courier New', monospace;
-                    }}
-                </style>
-                """,
-                unsafe_allow_html=True
-            )
+            # Display categorized hashtags
+            for cat in categories:
+                if categorized_tags[cat]:
+                    styled = " ".join([f"<span class='hashtag'>{tag}</span>" for tag in categorized_tags[cat]])
+                    st.markdown(f"**{cat} Hashtags**", unsafe_allow_html=True)
+                    st.markdown(
+                        f"""
+                        <div class="hashtag-container">{styled}</div>
+                        <style>
+                            .hashtag-container {{
+                                margin-top: 5px;
+                                display: flex;
+                                flex-wrap: wrap;
+                                gap: 8px;
+                            }}
+                            .hashtag {{
+                                background-color: #f0f0f5;
+                                color: #333;
+                                padding: 6px 10px;
+                                border-radius: 20px;
+                                font-size: 14px;
+                                font-family: 'Courier New', monospace;
+                            }}
+                        </style>
+                        """,
+                        unsafe_allow_html=True
+                    )
         else:
             st.info("No AI hashtags available for this post.")
+
     else:
         st.info("No posts to show.")
