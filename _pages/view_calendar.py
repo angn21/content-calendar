@@ -139,9 +139,9 @@ def show(df):
     <div style='margin-top: 16px;'>
         <strong>Status Legend:</strong>
         <div style='display: flex; gap: 12px; margin-top: 8px; flex-wrap: wrap;'>
-            <div style='background-color: #FFF9C4; padding: 6px 12px; border-radius: 8px;'>🟡 Planned</div>
-            <div style='background-color: #B3E5FC; padding: 6px 12px; border-radius: 8px;'>🔵 Scheduled</div>
-            <div style='background-color: #C8E6C9; padding: 6px 12px; border-radius: 8px;'>🟢 Posted</div>
+            <div style='background-color: #FFF9C4; color: black; padding: 6px 12px; border-radius: 8px;'>🟡 Planned</div>
+            <div style='background-color: #B3E5FC; color: black; padding: 6px 12px; border-radius: 8px;'>🔵 Scheduled</div>
+            <div style='background-color: #C8E6C9; color: black; padding: 6px 12px; border-radius: 8px;'>🟢 Posted</div>
         </div>
     </div>
     """
