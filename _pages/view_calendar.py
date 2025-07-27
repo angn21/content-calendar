@@ -89,6 +89,8 @@ def show(df):
             padding: 8px;
             vertical-align: top;
             min-height: 80px;
+            width: 14.28%;
+            word-wrap: break-word;
         }
         table.calendar td {
             height: 100px;
