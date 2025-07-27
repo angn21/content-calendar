@@ -50,14 +50,12 @@ elif page == "Monitoring":
 if "refreshing" not in st.session_state:
     st.session_state.refreshing = False
 
-refresh_clicked = st.sidebar.button("🔄 Refresh Data")
-
-if refresh_clicked:
-    st.cache_data.clear()
+if st.sidebar.button("Refresh Data") and not st.session_state.refreshing:
     st.session_state.refreshing = True
-    # Instead of rerun, just return to restart the script cleanly
-    st.experimental_rerun()
+    st.cache_data.clear()
+    st.session_state["__rerun"] = True
 
 if st.session_state.refreshing:
-    st.success("✅ Data was refreshed!")
+    with st.spinner("Refreshing data..."):
+        st.success("✅ Data refreshed!")
     st.session_state.refreshing = False

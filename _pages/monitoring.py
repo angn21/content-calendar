@@ -6,7 +6,7 @@ st.set_page_config(page_title="Monitoring Dashboard", layout="wide")
 st.title("📊 Monitoring Dashboard")
 
 # --- Get the Monitoring worksheet ---
-@st.cache_data(show_spinner=False)
+@st.cache_data(ttl = 60, show_spinner=False)
 def load_monitoring_data():
     worksheet = get_worksheet().spreadsheet.worksheet("Monitoring")
     data = worksheet.get_all_records()
