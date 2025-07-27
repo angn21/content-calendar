@@ -33,7 +33,7 @@ def show():
         df["DateTime"] = df["Timestamp"].dt.floor("T")  # round to nearest minute
 
         # Define success statuses
-        success_statuses = ["AI Hashtag - No Update", "AI Formula - No Update"]
+        success_statuses = ["AI Hashtag - No Update", "AI Formula - No Update", "AI Hashtag Formula Added", "AI Idea Formula Added"]
 
         # Success is 1 if status contains any of success_statuses, else 0
         df["Success"] = df["Status"].apply(
