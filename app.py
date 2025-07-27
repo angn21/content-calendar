@@ -5,7 +5,7 @@ worksheet = get_worksheet()
 df = load_data(worksheet)
 
 st.sidebar.title("Navigation")
-page = st.sidebar.radio("Go to", ["Home", "Add Entry", "Edit Entry", "Delete Entry", "Calendar & Ideas", "Analytics", ])
+page = st.sidebar.radio("Go to", ["Home", "Add Entry", "Edit Entry", "Delete Entry", "Calendar & Ideas", "AI Ideas", "Analytics",])
 
 if page == "Home":
     import _pages.home as home
@@ -36,6 +36,11 @@ elif page == "Delete Entry":
     import _pages.delete_entry as delete_entry
     st.title("🗑️ Delete a Post")
     delete_entry.show(df, worksheet)
+
+elif page == "AI Ideas":
+    import _pages.ai_ideas as ai_ideas
+    st.title("🧠 AI Content Explorer")
+    ai_ideas.show(df, worksheet)
 
 if "refreshing" not in st.session_state:
     st.session_state.refreshing = False
