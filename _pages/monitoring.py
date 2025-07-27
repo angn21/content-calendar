@@ -3,7 +3,7 @@ import pandas as pd
 from utils.data_utils import get_worksheet  
 import plotly.graph_objects as go
 from google.cloud import monitoring_v3
-from google.auth import service_account
+from google.oauth2 import service_account
 from datetime import datetime, timedelta, timezone
 
 # --- Get the Monitoring worksheet ---
