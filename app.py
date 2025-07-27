@@ -54,6 +54,7 @@ if st.sidebar.button("Refresh Data") and not st.session_state.refreshing:
     st.session_state.refreshing = True
     st.cache_data.clear()
     st.session_state["__rerun"] = True
+    st.experimental_rerun()
 
 if st.session_state.refreshing:
     with st.spinner("Refreshing data..."):
