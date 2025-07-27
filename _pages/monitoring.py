@@ -16,9 +16,8 @@ def load_data(refresh_token):
     df = pd.DataFrame(data)
     return df
 
-df = load_data(st.session_state.refresh_token)
-
 def show():
+    df = load_data(st.session_state.refresh_token)
     # --- Clean and prepare data ---
     if not df.empty:
         df["Timestamp"] = pd.to_datetime(df["Timestamp"])
