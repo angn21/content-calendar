@@ -3,7 +3,6 @@ import streamlit as st
 import pandas as pd
 
 def show(df):
-    st.markdown("## 🧠 AI Content Explorer")
 
     if not df.empty:
         df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
@@ -14,10 +13,10 @@ def show(df):
         ai_idea = row.get("AI Idea", "No AI idea available.")
         ai_hashtags = row.get("AI Hashtags", "")
 
-        st.markdown("### 🧐 AI Suggested Post Idea")
+        st.markdown("### AI Suggested Post Idea")
         st.write(ai_idea)
 
-        st.markdown("### 🏽️ AI Hashtags")
+        st.markdown("### AI Hashtags")
         if ai_hashtags.strip():
             hashtag_list = [tag.strip() for tag in ai_hashtags.split() if tag.strip()]
             styled_hashtags = " ".join([f"<span class='hashtag'>{tag}</span>" for tag in hashtag_list])

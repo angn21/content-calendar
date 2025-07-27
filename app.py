@@ -5,7 +5,7 @@ worksheet = get_worksheet()
 df = load_data(worksheet)
 
 st.sidebar.title("Navigation")
-page = st.sidebar.radio("Go to", ["Home", "Add Entry", "Edit Entry", "Delete Entry", "Calendar & Ideas", "AI Ideas", "Analytics",])
+page = st.sidebar.radio("Go to", ["Home", "Add Entry", "Edit Entry", "Delete Entry", "Calendar", "AI Content Explorer", "Analytics",])
 
 if page == "Home":
     import _pages.home as home
@@ -17,7 +17,7 @@ elif page == "Add Entry":
     st.title("Add Entry")
     add_entry.show(worksheet)
 
-elif page == "Calendar & Ideas":
+elif page == "Calendar":
     import _pages.view_calendar as view_calendar
     st.title("📋 Current Calendar with AI Ideas")
     view_calendar.show(df)
@@ -37,7 +37,7 @@ elif page == "Delete Entry":
     st.title("🗑️ Delete a Post")
     delete_entry.show(df, worksheet)
 
-elif page == "AI Ideas":
+elif page == "AI Content Explorer":
     import _pages.ai_ideas as ai_ideas
     st.title("🧠 AI Content Explorer")
     ai_ideas.show(df)
