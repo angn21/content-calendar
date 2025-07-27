@@ -73,16 +73,8 @@ def show(df):
     # Format the date column to exclude time
     filtered_display_df['Date'] = filtered_display_df['Date'].dt.date
     
-    # Make Link clickable
-    if "Link" in filtered_display_df.columns:
-        filtered_display_df['Link'] = filtered_display_df['Link'].apply(
-            lambda url: f"[🔗 Link]({url})" if pd.notna(url) and url.startswith("http") else ""
-        )
-
-    # Render as markdown table
     st.markdown("### 📅 Your Posts")
-    st.markdown(filtered_display_df.to_markdown(index=False), unsafe_allow_html=True)
-
+    st.dataframe(filtered_display_df, use_container_width=True)
 
     if not filtered_df.empty:
         # Rest of your logic (selectbox, AI idea + hashtags, etc.)
