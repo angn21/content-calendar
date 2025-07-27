@@ -1,5 +1,29 @@
 import streamlit as st
 from utils.data_utils import get_worksheet, load_data
+from datetime import datetime, timedelta
+
+# --- Helper: Friendly time formatting ---
+def time_ago(ts):
+    if ts == "Never":
+        return ts
+    try:
+        past = datetime.strptime(ts, "%Y-%m-%d %H:%M:%S")
+        now = datetime.now()
+        diff = now - past
+
+        if diff < timedelta(seconds=60):
+            return "just now"
+        elif diff < timedelta(hours=1):
+            mins = diff.seconds // 60
+            return f"{mins} minute{'s' if mins != 1 else ''} ago"
+        elif diff < timedelta(days=1):
+            hours = diff.seconds // 3600
+            return f"{hours} hour{'s' if hours != 1 else ''} ago"
+        else:
+            days = diff.days
+            return f"{days} day{'s' if days != 1 else ''} ago"
+    except Exception:
+        return ts
 
 worksheet = get_worksheet()
 df = load_data(worksheet)
@@ -50,6 +74,9 @@ elif page == "Monitoring":
 if "refreshing" not in st.session_state:
     st.session_state.refreshing = False
 
+if "last_refresh" not in st.session_state:
+    st.session_state.last_refresh = "Never"
+
 if st.sidebar.button("Refresh Data") and not st.session_state.refreshing:
     st.session_state.refreshing = True
     st.cache_data.clear()
@@ -58,4 +85,7 @@ if st.sidebar.button("Refresh Data") and not st.session_state.refreshing:
 if st.session_state.refreshing:
     with st.spinner("Refreshing data..."):
         st.success("✅ Data refreshed!")
+        st.session_state.last_refresh = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         st.session_state.refreshing = False
+
+st.sidebar.markdown(f"🕒 **Last Refreshed:** {time_ago(st.session_state.last_refresh)}")
