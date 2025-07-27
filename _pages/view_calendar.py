@@ -149,7 +149,7 @@ def show(df):
     st.markdown(html, unsafe_allow_html=True)
 
     # --- Display
-    hidden_cols = ["AI Idea", "AI Hashtags"]  # already hidden as per your last request
+    hidden_cols = ["AI Idea", "AI Hashtags", "Previous Title", "Previous Content", "Previous Objectives", "Previous Audience", "Previous Strategy", "Previous Pillars", "Previous CTAs"]  # already hidden as per your last request
     filtered_display_df = filtered_df.drop(columns=[col for col in hidden_cols if col in filtered_df.columns])
 
     # Format the date column to exclude time
