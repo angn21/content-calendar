@@ -134,7 +134,6 @@ def show(df):
     st.dataframe(filtered_display_df, use_container_width=True)
 
     if not filtered_df.empty:
-        # Rest of your logic (selectbox, AI idea + hashtags, etc.)
         titles = filtered_df['Title'].tolist()
         selected_title_view = st.selectbox("Select a post to view AI content", titles, key="view_ai_select")
 
