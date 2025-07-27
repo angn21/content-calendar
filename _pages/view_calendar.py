@@ -102,6 +102,7 @@ def show(df):
             margin: 4px 0;
             padding: 4px 6px;
             font-size: 13px;
+            colour: black;
         }
         </style>
     """, unsafe_allow_html=True)
