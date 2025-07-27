@@ -1,9 +1,7 @@
 import streamlit as st
 import pandas as pd
-from utils.data_utils import get_worksheet  # Adjust the import path if needed
-
-st.set_page_config(page_title="Monitoring Dashboard", layout="wide")
-st.title("📊 Monitoring Dashboard")
+from utils.data_utils import get_worksheet  
+import plotly.graph_objects as go
 
 # --- Get the Monitoring worksheet ---
 @st.cache_data(ttl = 60, show_spinner=False)
@@ -28,14 +26,54 @@ def show():
         col2.metric("Errors", errors)
         col3.metric("Error Rate", f"{error_rate:.1f}%")
 
-        # --- Timeline Chart ---
         st.subheader("Execution Timeline")
-        df["StatusCategory"] = df["Status"].apply(lambda x: "Error" if "Error" in x else "Success")
-        df["Count"] = 1
-        chart_data = df.groupby(["Timestamp", "StatusCategory"])["Count"].count().reset_index()
-        chart_pivot = chart_data.pivot(index="Timestamp", columns="StatusCategory", values="Count").fillna(0)
-        st.line_chart(chart_pivot)
 
+        # Prepare data
+        df["Date"] = df["Timestamp"].dt.date
+        daily_summary = df.groupby("Date").agg(
+            Executions=("Status", "count"),
+            Errors=("Status", lambda x: x.str.contains("Error", case=False, na=False).sum())
+        ).reset_index()
+        daily_summary["ErrorRate"] = (daily_summary["Errors"] / daily_summary["Executions"]) * 100
+
+        # Create plot
+        fig = go.Figure()
+
+        # Bar for Executions
+        fig.add_trace(go.Bar(
+            x=daily_summary["Date"],
+            y=daily_summary["Executions"],
+            name="Executions",
+            marker_color="steelblue",
+            yaxis="y1"
+        ))
+
+        # Line for Error Rate
+        fig.add_trace(go.Scatter(
+            x=daily_summary["Date"],
+            y=daily_summary["ErrorRate"],
+            name="Error Rate (%)",
+            mode="lines+markers",
+            marker_color="firebrick",
+            yaxis="y2"
+        ))
+
+        # Layout
+        fig.update_layout(
+            title="Daily Executions and Error Rate",
+            xaxis=dict(title="Date"),
+            yaxis=dict(title="Executions", side="left"),
+            yaxis2=dict(
+                title="Error Rate (%)",
+                overlaying="y",
+                side="right",
+                showgrid=False,
+                range=[0, 100]
+            ),
+            legend=dict(x=0.01, y=0.99),
+            height=450
+        )
+        st.plotly_chart(fig, use_container_width=True)
         # --- Raw Logs ---
         with st.expander("View Raw Logs"):
             st.dataframe(df)
