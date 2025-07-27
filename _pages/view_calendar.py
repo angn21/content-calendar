@@ -79,9 +79,39 @@ def show(df):
             lambda url: f"[🔗 Link]({url})" if pd.notna(url) and url.startswith("http") else ""
         )
 
-    # Render as markdown table
+    # Convert DataFrame to HTML
+    html_table = filtered_display_df.to_html(index=False, escape=False)
+
+    # Inject a wider style for the 'Content' column
+    # You can do this by targeting the nth-child of the column (assuming you know its index)
+    content_col_index = filtered_display_df.columns.get_loc("Content") + 1  # +1 because nth-child is 1-based
+
+    # Style the Content column using nth-child
+    styled_html = f"""
+    <style>
+    table {{
+        width: 100%;
+        border-collapse: collapse;
+    }}
+    th, td {{
+        text-align: left;
+        padding: 8px;
+        border: 1px solid #ddd;
+    }}
+    td:nth-child({content_col_index}) {{
+        min-width: 300px;
+        max-width: 500px;
+        white-space: pre-wrap;
+        word-break: break-word;
+    }}
+    </style>
+    {html_table}
+    """
+
+    # Render styled HTML table
     st.markdown("### 📅 Your Posts")
-    st.markdown(filtered_display_df.to_markdown(index=False), unsafe_allow_html=True)
+    st.markdown(styled_html, unsafe_allow_html=True)
+
 
 
     if not filtered_df.empty:
