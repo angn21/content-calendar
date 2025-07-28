@@ -67,20 +67,7 @@ def show(df):
             combined_condition |= cond
         filtered_df = filtered_df[combined_condition]
 
-    # --- Status Summary ---
-    st.markdown("### 📊 Post Summary")
-
-    status_counts = (
-        filtered_df['Status']
-        .value_counts()
-        .reindex(["Planned", "Scheduled", "Posted"], fill_value=0)
-        .to_dict()
-    )
-
-    col1, col2, col3 = st.columns(3)
-    col1.metric("🟡 Planned", status_counts.get("Planned", 0))
-    col2.metric("🔵 Scheduled", status_counts.get("Scheduled", 0))
-    col3.metric("🟢 Posted", status_counts.get("Posted", 0))
+    
 
     # --- Calendar View ---
     st.markdown("### 🗓️ Calendar View")
