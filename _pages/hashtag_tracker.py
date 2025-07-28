@@ -4,27 +4,31 @@ from bs4 import BeautifulSoup
 
 
 def fetch_instagram_search_count(hashtag):
-    query = f"site:instagram.com #{hashtag}"
+    query = f"site:instagram.com \"{hashtag}\""
     headers = {"User-Agent": "Mozilla/5.0"}
     try:
-        response = requests.get(f"https://www.google.com/search?q={query}", headers=headers, timeout=5)
-        soup = BeautifulSoup(response.text, "html.parser")
+        response = requests.get(f"https://www.google.com/search?q={query}", headers=headers, timeout=10)
         
-        # Try primary method
-        result_stats = soup.select_one("#result-stats")
-        if result_stats:
-            return result_stats.text
+        if "Our systems have detected unusual traffic" in response.text:
+            return "⚠️ Google blocked the request. Try again later or use a different IP."
 
-        # Fallback: try to extract estimates from another tag (optional)
-        divs = soup.find_all("div")
-        for div in divs:
+        soup = BeautifulSoup(response.text, "html.parser")
+
+        # Fallback: Parse title
+        page_title = soup.title.string if soup.title else ""
+        if "results" in page_title.lower():
+            return page_title
+
+        # Extra fallback: check all divs
+        for div in soup.find_all("div"):
             if div.text and "results" in div.text.lower():
-                return div.text
-        
-        return "No visible result stats found. Google may have blocked scraping."
+                return div.text.strip()
+
+        return "❌ Could not detect result count in Google response."
     
     except Exception as e:
-        return f"Error during fetch: {e}"
+        return f"❌ Error fetching results: {e}"
+
 
 
 def show():
