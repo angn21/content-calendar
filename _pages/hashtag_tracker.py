@@ -4,7 +4,6 @@ from bs4 import BeautifulSoup
 
 
 def fetch_instagram_search_count(hashtag):
-    def fetch_instagram_search_count_duckduckgo(hashtag):
     query = f"site:instagram.com \"{hashtag}\""
     headers = {"User-Agent": "Mozilla/5.0"}
 
@@ -24,7 +23,6 @@ def fetch_instagram_search_count(hashtag):
 
     except Exception as e:
         return f"❌ Error fetching results: {e}"
-
 def show():
     st.title("📈 Hashtag Popularity Tracker")
     st.markdown("""
