@@ -2,8 +2,6 @@ import streamlit as st
 import pandas as pd
 
 def show(df):
-    st.subheader("📊 Post Status Dashboard")
-
     if df.empty:
         st.info("No data to display in dashboard.")
     else:

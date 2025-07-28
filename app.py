@@ -29,7 +29,7 @@ worksheet = get_worksheet()
 df = load_data(worksheet)
 
 st.sidebar.title("Navigation")
-page = st.sidebar.radio("Go to", ["Home", "Add Post", "Edit Post", "Delete Post", "Calendar", "AI Content Explorer", "Analytics", "Monitoring"])
+page = st.sidebar.radio("Go to", ["Home", "Add Post", "Edit Post", "Delete Post", "Calendar", "AI Content Explorer", "Hashtag Tracker", "Statistics", "Monitoring"])
 
 if page == "Home":
     import _pages.home as home
@@ -46,9 +46,9 @@ elif page == "Calendar":
     st.title("📋 Current Calendar")
     view_calendar.show(df)
 
-elif page == "Analytics":
+elif page == "Statistics":
     import _pages.analytics as analytics
-    st.title("📊 Analytics Dashboard")
+    st.title("📊 Statistics Dashboard")
     analytics.show(df)
 
 elif page == "Edit Post":
@@ -68,8 +68,13 @@ elif page == "AI Content Explorer":
 
 elif page == "Monitoring":
     import _pages.monitoring as monitoring
-    st.title("📈 Monitoring Dashboard")
+    st.title("📊 Monitoring Dashboard")
     monitoring.show()
+
+elif page == "Hashtag Tracker":
+    import _pages.hashtag_tracker as hashtag_tracker
+    st.title("📈 Hashtag Popularity Tracker")
+    hashtag_tracker.show()    
 
 if "refreshing" not in st.session_state:
     st.session_state.refreshing = False
