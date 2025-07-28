@@ -54,7 +54,7 @@ def show(df):
             df['Content'].str.lower().str.contains(query)
         )
 
-    # Apply date filters (AND logic for date range)
+    # Apply date filters 
     if start_date:
         filtered_df = filtered_df[filtered_df['Date'] >= pd.to_datetime(start_date)]
     if end_date:
