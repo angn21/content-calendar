@@ -4,32 +4,26 @@ from bs4 import BeautifulSoup
 
 
 def fetch_instagram_search_count(hashtag):
+    def fetch_instagram_search_count_duckduckgo(hashtag):
     query = f"site:instagram.com \"{hashtag}\""
     headers = {"User-Agent": "Mozilla/5.0"}
+
     try:
-        response = requests.get(f"https://www.google.com/search?q={query}", headers=headers, timeout=10)
-        
-        if "Our systems have detected unusual traffic" in response.text:
-            return "⚠️ Google blocked the request. Try again later or use a different IP."
+        url = f"https://html.duckduckgo.com/html/?q={query}"
+        response = requests.get(url, headers=headers, timeout=10)
 
         soup = BeautifulSoup(response.text, "html.parser")
 
-        # Fallback: Parse title
-        page_title = soup.title.string if soup.title else ""
-        if "results" in page_title.lower():
-            return page_title
+        results = soup.find_all("a", href=True)
+        instagram_links = [a for a in results if "instagram.com" in a["href"]]
 
-        # Extra fallback: check all divs
-        for div in soup.find_all("div"):
-            if div.text and "results" in div.text.lower():
-                return div.text.strip()
+        if len(instagram_links) > 0:
+            return f"✅ Found {len(instagram_links)} Instagram links with #{hashtag} (via DuckDuckGo)."
+        else:
+            return "❌ No Instagram results found."
 
-        return "❌ Could not detect result count in Google response."
-    
     except Exception as e:
         return f"❌ Error fetching results: {e}"
-
-
 
 def show():
     st.title("📈 Hashtag Popularity Tracker")
