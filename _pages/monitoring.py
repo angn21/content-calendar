@@ -46,7 +46,7 @@ def show():
         }).fillna(0).reset_index()
 
         # Rolling error rate (over last N entries)
-        rolling_window = 6  # adjust as needed
+        rolling_window = 5  # adjust as needed
         df_resampled["ErrorRate"] = 100 * (1 - df_resampled["Success"].rolling(rolling_window, min_periods=1).mean())
 
         # Plotly figure with dual y-axis
