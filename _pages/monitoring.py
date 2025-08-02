@@ -15,13 +15,7 @@ def show():
     df = load_data()
     # --- Clean and prepare data ---
     if not df.empty:
-        # Safe datetime parsing
-        df["Timestamp"] = pd.to_datetime(df["Timestamp"], errors="coerce")
-        df = df.dropna(subset=["Timestamp"])
-
-        # Filter out old rows
-        df = df[df["Timestamp"] > pd.Timestamp.now() - pd.Timedelta(days=7)]
-
+        df["Timestamp"] = pd.to_datetime(df["Timestamp"])
         total_runs = len(df)
         errors = df["Status"].str.contains("Error", case=False, na=False).sum()
         error_rate = (errors / total_runs) * 100 if total_runs else 0
@@ -47,7 +41,7 @@ def show():
         )
 
         # Resample to fixed intervals (e.g. 5 min) and fill gaps with 0 (fail)
-        df_resampled = df.set_index("DateTime").resample("5min").agg({
+        df_resampled = df.set_index("DateTime").resample("1min").agg({
             "Success": "mean"
         }).fillna(0).reset_index()
 
