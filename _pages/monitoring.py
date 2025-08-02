@@ -15,7 +15,13 @@ def show():
     df = load_data()
     # --- Clean and prepare data ---
     if not df.empty:
-        df["Timestamp"] = pd.to_datetime(df["Timestamp"])
+        # Safe datetime parsing
+        df["Timestamp"] = pd.to_datetime(df["Timestamp"], errors="coerce")
+        df = df.dropna(subset=["Timestamp"])
+
+        # Filter out old rows
+        df = df[df["Timestamp"] > pd.Timestamp.now() - pd.Timedelta(days=7)]
+
         total_runs = len(df)
         errors = df["Status"].str.contains("Error", case=False, na=False).sum()
         error_rate = (errors / total_runs) * 100 if total_runs else 0
