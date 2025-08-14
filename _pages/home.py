@@ -6,8 +6,12 @@ def fetch_instagram_stats(username):
     url = f"https://instrack.app/instagram/{username}"
     headers = {"User-Agent": "Mozilla/5.0"}
     res = requests.get(url, headers=headers, timeout=10)
-    soup = BeautifulSoup(res.text, "html.parser")
 
+    # Debug: save HTML so we can inspect it
+    with open("debug_instrack.html", "w", encoding="utf-8") as f:
+        f.write(res.text)
+
+    soup = BeautifulSoup(res.text, "html.parser")
     stats = {}
     for label in soup.find_all("h6", class_="text-secondary"):
         label_text = label.get_text(strip=True)
@@ -18,6 +22,7 @@ def fetch_instagram_stats(username):
             except ValueError:
                 stats[label_text] = number_tag.get_text(strip=True)
     return stats
+
 
 def show():
     st.title("📅 Content Calendar for the cutest social media manager in the world🍵🍓")
