@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 from playwright.sync_api import sync_playwright
 from datetime import datetime
 
-# --- Instagram scrape ---
+# -- Instagram scrape --
 def fetch_instagram_stats(username):
     url = f"https://instrack.app/instagram/{username}"
     stats = {}
