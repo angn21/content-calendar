@@ -34,21 +34,5 @@ def show():
     
     Thank you for using this, love you <3
     """)
-
-    st.divider()
-    st.subheader("📊 Instagram Account Overview")
-
-    username = "thesocialfernish"  # your handle here
-    with st.spinner("Fetching Instagram stats…"):
-        stats = fetch_instagram_stats(username)
-
-    if stats:
-        col1, col2, col3 = st.columns(3)
-        col1.metric("Followers", stats.get("Followers", "N/A"))
-        col2.metric("Following", stats.get("Following", "N/A"))
-        col3.metric("Posts", stats.get("Posts", "N/A"))
-    else:
-        st.error("Could not fetch Instagram stats.")
-
 if __name__ == "__main__":
     show()
