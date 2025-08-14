@@ -38,8 +38,8 @@ def show():
     st.divider()
     st.subheader("📊 Instagram Account Overview")
 
-    username = "thesocialfernish"  # Change this to your account
-    with st.spinner("Fetching Instagram stats..."):
+    username = "thesocialfernish"  # your handle here
+    with st.spinner("Fetching Instagram stats…"):
         stats = fetch_instagram_stats(username)
 
     if stats:
