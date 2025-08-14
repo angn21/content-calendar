@@ -1,18 +1,21 @@
 import streamlit as st
-import requests
 from bs4 import BeautifulSoup
+from playwright.sync_api import sync_playwright
 
 def fetch_instagram_stats(username):
     url = f"https://instrack.app/instagram/{username}"
-    headers = {"User-Agent": "Mozilla/5.0"}
-    res = requests.get(url, headers=headers, timeout=10)
-
-    # Debug: save HTML so we can inspect it
-    with open("debug_instrack.html", "w", encoding="utf-8") as f:
-        f.write(res.text)
-
-    soup = BeautifulSoup(res.text, "html.parser")
     stats = {}
+
+    with sync_playwright() as pw:
+        browser = pw.chromium.launch(headless=True)
+        page = browser.new_page()
+        page.goto(url, timeout=15000)
+        page.wait_for_selector("h6.text-secondary", timeout=10000)
+        html = page.content()
+        browser.close()
+
+    soup = BeautifulSoup(html, "html.parser")
+
     for label in soup.find_all("h6", class_="text-secondary"):
         label_text = label.get_text(strip=True)
         number_tag = label.find_next("h4", class_="font-weight-bolder my-50")
@@ -22,7 +25,6 @@ def fetch_instagram_stats(username):
             except ValueError:
                 stats[label_text] = number_tag.get_text(strip=True)
     return stats
-
 
 def show():
     st.title("📅 Content Calendar for the cutest social media manager in the world🍵🍓")
@@ -43,7 +45,7 @@ def show():
     st.divider()
     st.subheader("📊 Instagram Account Overview")
 
-    username = "thesocialfernish"  # your handle here
+    username = "thesocialfernish"
     with st.spinner("Fetching Instagram stats…"):
         stats = fetch_instagram_stats(username)
 
