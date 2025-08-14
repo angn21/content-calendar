@@ -1,54 +1,91 @@
 import streamlit as st
-import requests
-from bs4 import BeautifulSoup
+from utils.data_utils import get_worksheet, load_data
+from datetime import datetime, timedelta
 
-def fetch_instagram_stats(username):
-    url = f"https://instrack.app/instagram/{username}"
-    headers = {"User-Agent": "Mozilla/5.0"}
-    res = requests.get(url, headers=headers, timeout=10)
-    soup = BeautifulSoup(res.text, "html.parser")
+# --- Helper: Friendly time formatting ---
+def time_ago(ts):
+    if ts == "Never":
+        return ts
+    try:
+        past = datetime.strptime(ts, "%Y-%m-%d %H:%M:%S")
+        now = datetime.now()
+        diff = now - past
 
-    stats = {}
-    for label in soup.find_all("h6", class_="text-secondary"):
-        label_text = label.get_text(strip=True)
-        number_tag = label.find_next("h4", class_="font-weight-bolder my-50")
-        if number_tag:
-            try:
-                stats[label_text] = int(number_tag.get_text(strip=True).replace(",", ""))
-            except ValueError:
-                stats[label_text] = number_tag.get_text(strip=True)
-    return stats
+        if diff < timedelta(seconds=60):
+            return "just now"
+        elif diff < timedelta(hours=1):
+            mins = diff.seconds // 60
+            return f"{mins} minute{'s' if mins != 1 else ''} ago"
+        elif diff < timedelta(days=1):
+            hours = diff.seconds // 3600
+            return f"{hours} hour{'s' if hours != 1 else ''} ago"
+        else:
+            days = diff.days
+            return f"{days} day{'s' if days != 1 else ''} ago"
+    except Exception:
+        return ts
 
-def show():
-    st.title("📅 Content Calendar for the cutest social media manager in the world🍵🍓")
-    st.markdown("""
-    You got this cutie patootie 💪
+worksheet = get_worksheet()
+df = load_data(worksheet)
 
-    **Currently, you can do these things here:**
-    - 🗓️ View and plan content using the calendar
-    - ✏️ Edit or delete existing entries to the calendar
-    - 📊 Monitor post statuses and tag distribution in the analytics dashboard
-    - 🤖 View AI-suggested post ideas and hashtags
+st.sidebar.title("Navigation")
+page = st.sidebar.radio("Go to", ["Home", "Add Post", "Edit Post", "Delete Post", "Calendar", "AI Content Explorer", "Statistics", "Monitoring"])
 
-    Use the sidebar to navigate between features.
-    
-    Thank you for using this, love you <3
-    """)
+if page == "Home":
+    import _pages.home as home
+    st.title("🏠 Home")
+    home.show()
 
-    st.divider()
-    st.subheader("📊 Instagram Account Overview")
+elif page == "Add Post":
+    import _pages.add_entry as add_entry
+    st.title("➕ Add a New Post")
+    add_entry.show(worksheet)
 
-    username = "thesocialfernish"  # your handle here
-    with st.spinner("Fetching Instagram stats…"):
-        stats = fetch_instagram_stats(username)
+elif page == "Calendar":
+    import _pages.view_calendar as view_calendar
+    st.title("📋 Current Calendar")
+    view_calendar.show(df)
 
-    if stats:
-        col1, col2, col3 = st.columns(3)
-        col1.metric("Followers", stats.get("Followers", "N/A"))
-        col2.metric("Following", stats.get("Following", "N/A"))
-        col3.metric("Posts", stats.get("Posts", "N/A"))
-    else:
-        st.error("Could not fetch Instagram stats.")
+elif page == "Statistics":
+    import _pages.analytics as analytics
+    st.title("📊 Statistics Dashboard")
+    analytics.show(df)
 
-if __name__ == "__main__":
-    show()
+elif page == "Edit Post":
+    import _pages.edit_entry as edit_entry
+    st.title("✏️ Edit an Existing Post")
+    edit_entry.show(df, worksheet)
+
+elif page == "Delete Post":
+    import _pages.delete_entry as delete_entry
+    st.title("🗑️ Delete a Post")
+    delete_entry.show(df, worksheet)
+
+elif page == "AI Content Explorer":
+    import _pages.ai_ideas as ai_ideas
+    st.title("🧠 AI Content Explorer")
+    ai_ideas.show(df)
+
+elif page == "Monitoring":
+    import _pages.monitoring as monitoring
+    st.title("📊 Monitoring Dashboard")
+    monitoring.show()  
+
+if "refreshing" not in st.session_state:
+    st.session_state.refreshing = False
+
+if "last_refresh" not in st.session_state:
+    st.session_state.last_refresh = "Never"
+
+if st.sidebar.button("Refresh Data") and not st.session_state.refreshing:
+    st.session_state.refreshing = True
+    st.cache_data.clear()
+    st.session_state["__rerun"] = True
+
+if st.session_state.refreshing:
+    with st.spinner("Refreshing data..."):
+        st.success("✅ Data refreshed!")
+        st.session_state.last_refresh = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        st.session_state.refreshing = False
+
+st.sidebar.markdown(f"🕒 **Last Refreshed:** {time_ago(st.session_state.last_refresh)}")
